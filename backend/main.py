@@ -61,13 +61,24 @@ class RecipeResource(Resource):
         """Get a Recipe by ID"""
         recipe=Recipe.query.get_or_404(id)
         return recipe
+    
 
+    @api.marshal_with(recipe_model)
     def put(self, id):
         """Update a Recipe by ID"""
-        pass
+        recipe_to_update=Recipe.query.get_or_404(id)
+        data=request.json()
+        return recipe_to_update.update(data.get('title'), data.get('description'))
+
+
+
+    @api.marshal_with(recipe_model)
     def delete(self, id):
         """Delete a Recipe by ID"""
-        pass
+
+        recipe_to_delete=Recipe.query.get_or_404(id)
+        return recipe_to_delete.delete()
+        
 
 
 @app.shell_context_processor
