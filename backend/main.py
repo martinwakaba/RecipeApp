@@ -1,0 +1,67 @@
+from flask import Flask
+from flask_restx import Api, Resource, fields
+from config import DevConfig
+from models import Recipe
+from exts import db
+
+
+app=Flask(__name__) 
+api=Api(app,doc='/docs')
+app.config.from_object(DevConfig)
+
+db.init_app(app)
+
+recipe_model=api.model(
+    "Recipe",{
+        "id":fields.Integer(),
+        "title":fields.String(),
+        "description":fields.String()
+    }
+)
+
+@api.route('/hello')
+class HelloResource(Resource):
+    def get(self):
+        return {"message":"Hello World!"}
+
+@api.route('/recipes')
+class RecipesResource(Resource):
+
+    @api.marshal_list_with(recipe_model)
+    def get(self):
+        """Get all Recipes"""
+
+
+        recipes=Recipe.query.all()
+        return recipes
+
+    def post(self):
+        """Create new Recipes"""
+        pass
+
+
+@api.route('/recipe/<int:id>')
+class RecipeResource(Resource):
+
+    def get(self,id):
+        """Get a Recipe by ID"""
+        pass
+
+    def put(self, id):
+        """Update a Recipe by ID"""
+        pass
+    def delete(self, id):
+        """Delete a Recipe by ID"""
+        pass
+
+
+@app.shell_context_processor
+def make_shedll_context():
+    return {
+        "db":db,
+        "Recipe":Recipe
+    }
+
+
+if __name__ == '__main__':
+    app.run()
